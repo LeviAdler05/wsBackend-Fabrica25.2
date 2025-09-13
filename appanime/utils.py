@@ -1,30 +1,35 @@
 import requests
+from .models import Anime, Quote
 
+import certifi  # Para garantir que Requests encontre os certificados SSL
+
+# -------------------- Jikan API --------------------
 JIKAN_BASE_URL = "https://api.jikan.moe/v4/anime"
 
-def buscar_anime_jikan(query, limit=5):
+def importar_animes(query="naruto", limit=5):
     """
-    Busca animes no Jikan API pelo nome (query).
-    Retorna uma lista de dicionários com os dados do anime.
+    Busca animes na API Jikan e salva no banco.
     """
     url = f"{JIKAN_BASE_URL}?q={query}&limit={limit}"
     try:
-        response = requests.get(url)
-        response.raise_for_status()  # levanta erro se não for 200
+        response = requests.get(url, verify=certifi.where())
+        response.raise_for_status()
         data = response.json()
-        resultados = []
-
+        
+        salvos = []
         for item in data.get("data", []):
-            anime_info = {
-                "nome": item.get("title"),
-                "imagem_capa": item.get("images", {}).get("jpg", {}).get("image_url"),
-                "ano_lancamento": item.get("aired", {}).get("from", None)[:4] if item.get("aired", {}).get("from") else None,
-                "descricao": item.get("synopsis"),
-                "genero": ", ".join([g["name"] for g in item.get("genres", [])])
-            }
-            resultados.append(anime_info)
-
-        return resultados
+            anime_obj, criado = Anime.objects.get_or_create(
+                nome=item.get("title"),
+                defaults={
+                    "imagem": item.get("images", {}).get("jpg", {}).get("image_url"),
+                    "ano": item.get("aired", {}).get("from", None)[:4] if item.get("aired", {}).get("from") else None,
+                    "descricao": item.get("synopsis"),
+                    "genero": ", ".join([g["name"] for g in item.get("genres", [])])
+                }
+            )
+            if criado:
+                salvos.append(anime_obj.nome)
+        return salvos
     except Exception as e:
-        print(f"Erro ao buscar anime no Jikan: {e}")
+        print(f"Erro ao importar animes: {e}")
         return []
