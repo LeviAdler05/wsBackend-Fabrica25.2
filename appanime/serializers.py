@@ -7,9 +7,7 @@ class QuoteSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class AnimeSerializer(serializers.ModelSerializer):
-    # Mostra os quotes relacionados a cada anime
     quotes = QuoteSerializer(many=True, read_only=True)
-
     class Meta:
         model = Anime
         fields = "__all__"

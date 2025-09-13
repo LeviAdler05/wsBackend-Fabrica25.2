@@ -3,7 +3,7 @@ from .models import Anime, Quote
 
 @admin.register(Anime)
 class AnimeAdmin(admin.ModelAdmin):
-    list_display = ("nome", "ano_lancamento", "genero")
+    list_display = ("nome", "ano", "genero")
 
 @admin.register(Quote)
 class QuoteAdmin(admin.ModelAdmin):

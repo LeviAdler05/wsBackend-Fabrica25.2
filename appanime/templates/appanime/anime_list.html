@@ -1,20 +1,58 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Animes</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .anime-card { display: inline-block; width: 200px; margin: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; text-align: center; }
+        .anime-card img { max-width: 100%; height: auto; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Lista de Animes</h1>
+    <form id="import-form">
+        <input type="text" name="query" placeholder="Nome do anime" required>
+        <input type="number" name="limit" value="5" min="1" max="20">
+        <button type="submit">Importar Animes</button>
+    </form>
+    <div id="mensagem"></div>
+    <div id="anime-list">
+        {% for anime in animes %}
+        <div class="anime-card">
+            <h3>{{ anime.nome }}</h3>
+            <img src="{{ anime.imagem }}" alt="{{ anime.nome }}">
+            <p>{{ anime.ano }}</p>
+            <p>{{ anime.genero }}</p>
+        </div>
+        {% empty %}
+        <p>Nenhum anime cadastrado ainda.</p>
+        {% endfor %}
+    </div>
 
-{% block content %}
-<h1>Lista de Animes</h1>
-
-<a href="{% url 'importar_animes' %}?query=naruto&limit=5">Importar Animes</a>
-
-<ul>
-  {% for anime in animes %}
-    <li>
-      <a href="{% url 'anime_detail' anime.pk %}">
-        <img src="{{ anime.imagem }}" alt="{{ anime.nome }}" width="120">
-        <strong>{{ anime.nome }}</strong> ({{ anime.ano }}) - {{ anime.genero }}
-      </a>
-    </li>
-  {% empty %}
-    <li>Nenhum anime cadastrado.</li>
-  {% endfor %}
-</ul>
-{% endblock %}
+    <script>
+        $(document).ready(function(){
+            $("#import-form").submit(function(e){
+                e.preventDefault();
+                let query = $("input[name='query']").val();
+                let limit = $("input[name='limit']").val();
+                $.ajax({
+                    url: "{% url 'importar_animes_ajax' %}",
+                    data: {query: query, limit: limit},
+                    dataType: "json",
+                    success: function(data){
+                        $("#mensagem").html(`Importados: ${data.salvos.join(", ")} (Total: ${data.total})`);
+                        $.get("{% url 'anime_list' %}", function(html){
+                            let novoHtml = $(html).find("#anime-list").html();
+                            $("#anime-list").html(novoHtml);
+                        });
+                    },
+                    error: function(xhr, status, error){
+                        $("#mensagem").html("Erro ao importar animes: " + error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -11,7 +11,7 @@ def anime_detail(request, pk):
     anime = get_object_or_404(Anime, pk=pk)
     return render(request, "appanime/anime_detail.html", {"anime": anime})
 
-def importar_animes_view(request):
+def importar_animes_ajax(request):
     query = request.GET.get("query", "naruto")
     limit = int(request.GET.get("limit", 5))
     salvos = importar_animes(query=query, limit=limit)
