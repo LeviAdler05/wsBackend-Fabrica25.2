@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Lista de Animes</h1>
+
+<a href="{% url 'importar_animes' %}?query=naruto&limit=5">Importar Animes</a>
+
+<ul>
+  {% for anime in animes %}
+    <li>
+      <a href="{% url 'anime_detail' anime.pk %}">
+        <img src="{{ anime.imagem }}" alt="{{ anime.nome }}" width="120">
+        <strong>{{ anime.nome }}</strong> ({{ anime.ano }}) - {{ anime.genero }}
+      </a>
+    </li>
+  {% empty %}
+    <li>Nenhum anime cadastrado.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

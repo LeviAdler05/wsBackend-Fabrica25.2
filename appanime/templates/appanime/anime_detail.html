@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ anime.nome }}</h1>
+
+<img src="{{ anime.imagem }}" alt="{{ anime.nome }}" width="200">
+<p><strong>Ano:</strong> {{ anime.ano }}</p>
+<p><strong>Gênero:</strong> {{ anime.genero }}</p>
+<p>{{ anime.descricao }}</p>
+
+<h2>Quotes</h2>
+<ul>
+  {% for quote in anime.quotes.all %}
+    <li>{{ quote.texto }} - {{ quote.autor|default:"Desconhecido" }}</li>
+  {% empty %}
+    <li>Nenhuma quote disponível.</li>
+  {% endfor %}
+</ul>
+
+<a href="{% url 'anime_list' %}">Voltar para lista</a>
+{% endblock %}
