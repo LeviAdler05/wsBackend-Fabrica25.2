@@ -1,0 +1,13 @@
+{% extends 'appanime/base.html' %}
+
+{% block title %}{% if edit %}Editar Anime{% else %}Adicionar Anime{% endif %}{% endblock %}
+
+{% block content %}
+    <h1>{% if edit %}Editar Anime{% else %}Adicionar Anime{% endif %}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a href="{% url 'appanime:anime_list' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+{% endblock %}

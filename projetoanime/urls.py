@@ -2,16 +2,19 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from appanime.viewsets import AnimeViewSet, QuoteViewSet
-from appanime import views
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 router = DefaultRouter()
-router.register(r"animes", AnimeViewSet, basename="anime")
-router.register(r"quotes", QuoteViewSet, basename="quote")
+router.register(r'animes', AnimeViewSet, basename='anime-api')
+router.register(r'quotes', QuoteViewSet, basename='quote-api')
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("api/", include(router.urls)),
-    path("animes/", views.anime_list, name="anime_list"),
-    path("animes/<int:pk>/", views.anime_detail, name="anime_detail"),
-    path("importar-animes/", views.importar_animes_ajax, name="importar_animes_ajax"),
+    path('admin/', admin.site.urls),
+    path('api/', include(router.urls)),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('', include('appanime.urls', namespace='appanime')),
 ]
